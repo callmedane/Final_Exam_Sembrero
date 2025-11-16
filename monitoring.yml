@@ -1,0 +1,28 @@
+---
+ - name: Install and configure Netdata monitoring tool
+   hosts: all
+   become: yes
+
+   tasks:
+     - name: Install dependencies (Debian)
+       apt: 
+         name: curl 
+         state: present
+       when: ansible_os_family == "Debian"
+
+     - name: Install dependencies (CentOS) 
+       yum: 
+         name: curl
+         state: present
+       when: ansible_os_family == "RedHat"
+
+     - name: Install Netdata
+       shell: "bash -c \"$(curl -fsSL https://my-netdata.io/kickstart.sh)\" --non-interactive"
+       args:
+         executable: /bin/bash
+
+     - name: Enable and start Netdata
+       service: 
+         name: netdata
+         state: started
+         enabled: yes

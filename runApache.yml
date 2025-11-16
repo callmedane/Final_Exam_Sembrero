@@ -1,0 +1,25 @@
+---
+ - name: Run Apache container
+   hosts: all
+   become: yes
+   tasks:
+     - name: Install Docker
+       apt:
+         name: docker.io
+         state: present
+       when: ansible_os_family == "Debian"
+
+     - name: Start Docker service
+       service: 
+         name: docker
+         state: started
+         enabled: yes
+
+     - name: Run Apache container
+       docker_container:
+         name: apache_container
+         image: httpd:latest
+         state: started
+         restart_policy: always
+         ports: 
+           - "8080:80"

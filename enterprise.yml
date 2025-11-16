@@ -1,0 +1,37 @@
+---
+ - name: Install and configure Apache Web Server
+   hosts: all
+   become: yes
+   gather_facts: yes
+
+   tasks:
+     - name: Install Apache Web Server on Debian
+       apt:
+         name: apache2
+         state: present
+         update_cache: yes
+       when: ansible_os_family == "Debian"
+
+     - name: Install Apache Web Server on CentOS
+       yum:
+         name: httpd
+         state: present
+       when: ansible_os_family == "RedHat"
+
+     - name: Start and enable Apache service
+       service:
+         name: "{{ 'apache2' if ansible_os_family == 'Debian' else 'httpd' }}"
+         enabled: yes
+         state: started
+         
+     - name: Create index.html
+       copy: 
+         dest: /var/www/html/index.html
+         content: 
+           <h1>Welcome to Apache Server Managed by Ansible</h1>
+       
+     - name: Change MOTD banner
+       copy: 
+         dest: /etc/motd
+         content: "Ansible Managed by Sembrero"
+
